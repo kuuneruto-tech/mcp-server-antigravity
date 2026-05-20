@@ -1,0 +1,28 @@
+{
+  "name": "mcp-server-antigravity",
+  "version": "1.0.0",
+  "description": "MCP server for Antigravity (agy CLI) — gives Claude web search, image generation, URL reading, and 1M-token context via Gemini",
+  "main": "index.js",
+  "bin": {
+    "mcp-server-antigravity": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "antigravity",
+    "gemini",
+    "claude",
+    "ai",
+    "web-search",
+    "image-generation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.0.0"
+  }
+}
