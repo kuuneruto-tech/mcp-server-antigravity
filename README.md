@@ -81,6 +81,10 @@ If `npx` doesn't work, just ask Claude Code:
 
 Claude will read this README and rebuild the server automatically. For reference, the server is a Node.js MCP server (`@modelcontextprotocol/sdk` + `zod`) that wraps `agy --print <prompt>` with `stdio: ["ignore", "pipe", "pipe"]` — the `ignore` on stdin is required, otherwise `agy` hangs waiting for input. It exposes one tool `ask_antigravity` with `prompt` (string) and optional `thinking_depth` (`"low"` / `"high"`) that prepends a brevity or deep-reasoning instruction to the prompt. The `agy` binary is resolved via `AGY_PATH` env var or `which agy` fallback.
 
+## Author
+
+[くうねると](https://note.com/kuuneruto)
+
 ## License
 
 MIT
