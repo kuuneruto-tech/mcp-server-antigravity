@@ -8,8 +8,9 @@ const { execSync } = require("child_process");
 function findAgy() {
   const custom = process.env.AGY_PATH;
   if (custom) return custom;
+  const cmd = process.platform === "win32" ? "where agy" : "which agy";
   try {
-    return execSync("which agy", { encoding: "utf8" }).trim();
+    return execSync(cmd, { encoding: "utf8" }).trim().split("\n")[0];
   } catch {
     throw new Error("Antigravity CLI (agy) not found. Install it or set AGY_PATH env var.");
   }
