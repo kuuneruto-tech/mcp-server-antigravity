@@ -67,6 +67,12 @@ If `agy` is not in your PATH, set the `AGY_PATH` environment variable:
 
 ---
 
+## Tip: Teach Claude when to use this tool
+
+Adding a few lines to your `CLAUDE.md` helps Claude decide when to delegate to Antigravity vs handle things itself (web search, image generation, large context, etc.). The right wording depends on your workflow — adjust to fit your environment.
+
+---
+
 ## Troubleshooting / Manual Setup
 
 If `npx` doesn't work, just ask Claude Code:
