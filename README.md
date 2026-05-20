@@ -83,7 +83,7 @@ Claude will read this README and rebuild the server automatically. For reference
 
 ## Author
 
-[くうねると](https://note.com/kuuneruto)
+[くうねると (kuuneruto)](https://note.com/kuuneruto)
 
 ## License
 
