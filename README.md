@@ -67,6 +67,22 @@ If `agy` is not in your PATH, set the `AGY_PATH` environment variable:
 
 ---
 
+## Tip: Pass file paths, not file contents
+
+When asking Antigravity to analyse a file, pass the **file path** rather than loading the file content yourself. Antigravity will read it directly via its `view_file` tool, saving your Claude context window.
+
+```
+# Good
+ask_antigravity("Analyse this file: /path/to/file.py")
+
+# Wasteful
+[read the file first, then paste 500 lines into the prompt]
+```
+
+Antigravity supports text, images, PDFs, audio, and video files this way.
+
+---
+
 ## Tip: Teach Claude when to use this tool
 
 Adding a few lines to your `CLAUDE.md` helps Claude decide when to delegate to Antigravity vs handle things itself (web search, image generation, large context, etc.). The right wording depends on your workflow — adjust to fit your environment.
