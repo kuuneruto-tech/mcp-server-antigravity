@@ -2,8 +2,9 @@
 const { McpServer } = require("@modelcontextprotocol/sdk/server/mcp.js");
 const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
 const { z } = require("zod");
-const { spawn } = require("child_process");
-const { execSync } = require("child_process");
+const { spawn, execSync } = require("child_process");
+const isWindows = process.platform === "win32";
+const pty = isWindows ? require("node-pty") : null;
 
 function findAgy() {
   const custom = process.env.AGY_PATH;
@@ -23,27 +24,58 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
+function stripAnsi(str) {
+  return str
+    .replace(/\x1b\][^\x07\x1b]*(\x07|\x1b\\)/g, "")
+    .replace(/\x1b\[[\?]?[0-9;]*[a-zA-Z]/g, "")
+    .replace(/\x1b[^[\]]/g, "")
+    .replace(/\[[\?]?[0-9;]*[a-zA-Z]/g, "")
+    .replace(/\r/g, "")
+    .trim();
+}
+
 function runAgy(args, timeout = 120000) {
   return new Promise((resolve, reject) => {
-    const proc = spawn(AGY_BIN, args, {
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    let stdout = "";
-    let stderr = "";
-    proc.stdout.on("data", (d) => { stdout += d; });
-    proc.stderr.on("data", (d) => { stderr += d; });
-    const timer = setTimeout(() => {
-      proc.kill();
-      reject(new Error("agy timed out after " + timeout + "ms"));
-    }, timeout);
-    proc.on("close", (code) => {
-      clearTimeout(timer);
-      if (code !== 0 && !stdout) {
-        reject(new Error(stderr || "agy exited with code " + code));
-      } else {
-        resolve(stdout || stderr || "(no response)");
-      }
-    });
+    if (isWindows) {
+      const proc = pty.spawn(AGY_BIN, args, {
+        name: "xterm-color",
+        cols: 220,
+        rows: 50,
+        env: process.env,
+      });
+      let output = "";
+      proc.onData((d) => { output += d; });
+      const timer = setTimeout(() => {
+        proc.kill();
+        reject(new Error("agy timed out after " + timeout + "ms"));
+      }, timeout);
+      proc.onExit(({ exitCode }) => {
+        clearTimeout(timer);
+        const clean = stripAnsi(output);
+        if (exitCode !== 0 && !clean) {
+          reject(new Error("agy exited with code " + exitCode));
+        } else {
+          resolve(clean || "(no response)");
+        }
+      });
+    } else {
+      const proc = spawn(AGY_BIN, args, { stdio: ["ignore", "pipe", "pipe"] });
+      let stdout = "", stderr = "";
+      proc.stdout.on("data", (d) => { stdout += d; });
+      proc.stderr.on("data", (d) => { stderr += d; });
+      const timer = setTimeout(() => {
+        proc.kill();
+        reject(new Error("agy timed out after " + timeout + "ms"));
+      }, timeout);
+      proc.on("close", (code) => {
+        clearTimeout(timer);
+        if (code !== 0 && !stdout) {
+          reject(new Error(stderr || "agy exited with code " + code));
+        } else {
+          resolve(stdout || stderr || "(no response)");
+        }
+      });
+    }
   });
 }
 
